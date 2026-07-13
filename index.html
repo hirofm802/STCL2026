@@ -91,7 +91,7 @@ body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text
 .results-list{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)}
 .result-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);transition:background .2s}
 .result-row:last-child{border-bottom:none}
-.result-row.is-live{background:var(--live-bg)}
+.result-row.is-live{background:var(--live-bg);box-shadow:inset 0 0 0 2px var(--live-red);position:relative;z-index:1}
 .result-row.is-soon{background:#fffaf0}
 .result-ko{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;color:var(--text-muted);width:44px;flex-shrink:0;text-align:center}
 .result-court{font-family:"Barlow Condensed",sans-serif;font-size:11px;letter-spacing:.04em;color:var(--text-muted);background:var(--green-light);border-radius:5px;padding:2px 7px;flex-shrink:0;white-space:nowrap}
@@ -520,7 +520,10 @@ function getMatchStatus(koH, koM){
   if(koH === null || koM === null || koH === undefined || koM === undefined) return 'none';
   const now = new Date();
   const jst = new Date(now.toLocaleString('en-US', {timeZone:'Asia/Tokyo'}));
-  if(jst.getFullYear()!==MATCH_DATE.year || jst.getMonth()+1!==MATCH_DATE.month || jst.getDate()!==MATCH_DATE.day) return 'none';
+  const todayMin = jst.getFullYear()*10000 + (jst.getMonth()+1)*100 + jst.getDate();
+  const matchDayMin = MATCH_DATE.year*10000 + MATCH_DATE.month*100 + MATCH_DATE.day;
+  if(todayMin < matchDayMin) return 'upcoming';
+  if(todayMin > matchDayMin) return 'done';
   const nowMin = jst.getHours()*60 + jst.getMinutes();
   const koMin = koH*60 + koM;
   if(nowMin >= koMin - SOON_BEFORE_MIN && nowMin < koMin) return 'soon';
